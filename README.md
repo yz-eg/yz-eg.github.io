@@ -10,6 +10,41 @@ There's nothing here yet, but I wanted to initialize the repository so that cont
 - [Lee Yiyuan: 2048 Bot](http://leeyiyuan.github.io/2048ai/)
 
 
+## Prerequisites
+
+* Node.js version 0.10.0 or newer
+* Install jspm, eslint, gulp globally
+
+```
+npm install -g jspm
+npm install -g eslint
+npm install -g gulp
+
+```
+## Installation
+
+To run locally for development.
+
+1. run `npm install`
+2. run `jspm install`
+
+## Running
+
+Start a local server, e.g. `python -m SimpleHTTPServer`.
+
+## Deploying
+
+To bundle the web app
+
+1. run `gulp bundle`, to bundle the app into build folder
+2. Either serve `build` folder locally.
+3. Or deploy it to gh-pages by running `gulp deploy`.
+
+## build
+
+This directory contains the minified source code for production deployment.
+
+npm install -g gulp
 The repository has the following structure:
 
     There is a directory for each chapter
