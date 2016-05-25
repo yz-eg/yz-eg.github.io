@@ -81,39 +81,42 @@ CSP.select_soln = function(assigned, vars_left, domains_left, neighbours, constr
 	
 };
 
-document.getElementById("output").innerHTML = "Running...";
+//ensure all DOM contents are loaded before running
+document.addEventListener("DOMContentLoaded", function(){
+	document.getElementById("backtrackCanvas").innerHTML = "Running...";
 
-var map_solution = CSP.get_solution ( ["WA", "NT", "SA", "Q", "NSW", "V", "T"],
-							{"WA":["r","g","b"], 
-							 "NT":["r","g","b"], 
-							 "SA":["r","g","b"], 
-							 "Q":["r","g","b"], 
-							 "NSW":["r","g","b"], 
-							 "V":["r","g","b"], 
-							 "T":["r","g","b"]},
-							{"WA":["NT", "SA"], 
-							 "NT":["WA", "SA", "Q"], 
-							 "SA":["WA", "NT", "Q", "NSW", "V"],
-							 "Q": ["NT", "SA", "NSW"],
-							 "NSW":["Q", "SA", "V"],
-							 "V":["SA", "NSW"],
-							 "T":[]},
-							function (A, a, B, b){
-								//the constraint is that the two colours should not equal each other if the two variables are neighbours
-								return a != b;
-							});
+	var map_solution = CSP.get_solution ( ["WA", "NT", "SA", "Q", "NSW", "V", "T"],
+										  {"WA":["r","g","b"], 
+										   "NT":["r","g","b"], 
+										   "SA":["r","g","b"], 
+										   "Q":["r","g","b"], 
+										   "NSW":["r","g","b"], 
+										   "V":["r","g","b"], 
+										   "T":["r","g","b"]},
+										  {"WA":["NT", "SA"], 
+										   "NT":["WA", "SA", "Q"], 
+										   "SA":["WA", "NT", "Q", "NSW", "V"],
+										   "Q": ["NT", "SA", "NSW"],
+										   "NSW":["Q", "SA", "V"],
+										   "V":["SA", "NSW"],
+										   "T":[]},
+										  function (A, a, B, b){
+											  //the constraint is that the two colours should not equal each other if the two variables are neighbours
+											  return a != b;
+										  });
 
-//print this to the HTML output
-var str = "";
-if (map_solution){
-	for (variable in map_solution){
-		if (map_solution.hasOwnProperty(variable)){
-			if (str != "")
-				str += ", ";
-			str += variable+" set to "+map_solution[variable];
+	//print this to the HTML output
+	var str = "";
+	if (map_solution){
+		for (variable in map_solution){
+			if (map_solution.hasOwnProperty(variable)){
+				if (str != "")
+					str += ", ";
+				str += variable+" set to "+map_solution[variable];
+			}
 		}
-	}
-}else
-	str = "Failed! No solution!";
+	}else
+		str = "Failed! No solution!";
 
-document.getElementById("output").innerHTML = str;
+	document.getElementById("backtrackCanvas").innerHTML = str;
+});
