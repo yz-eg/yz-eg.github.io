@@ -28,9 +28,9 @@ To run locally for development.
 
 ## Running
 
-Start a local server, e.g. `python -m SimpleHTTPServer` for Python 2.x or `python -m http.server` for Python 3.x
+Start a local server, e.g. `python -m SimpleHTTPServer 80` for Python 2.x or `python -m http.server 80` for Python 3.x
 
-Then visit `localhost:8000` using your browser. 
+Then visit `http://localhost` using your browser. 
 
 ## Deploying
 
