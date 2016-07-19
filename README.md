@@ -1,5 +1,7 @@
-[# aima-javascript](http://aimacode.github.io/aima-javascript/)
+# aima-javascript
 Javascript implementation of algorithms (and visualizations) from Russell And Norvig's "Artificial Intelligence - A Modern Approach"
+
+[Click here to go to the static hosted page](http://aimacode.github.io/aima-javascript/)
 
 Some Javascript visualizations that I admire, and would like to see similar kinds of things here:
 - [Red Blob Games: A* Tutorial](http://www.redblobgames.com/pathfinding/a-star/introduction.html)
