@@ -1,4 +1,4 @@
-# aima-javascript
+[# aima-javascript](http://aimacode.github.io/aima-javascript/)
 Javascript implementation of algorithms (and visualizations) from Russell And Norvig's "Artificial Intelligence - A Modern Approach"
 
 Some Javascript visualizations that I admire, and would like to see similar kinds of things here:
