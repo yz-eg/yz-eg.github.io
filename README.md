@@ -60,4 +60,4 @@ The repository has the following structure:
 
 # Contribution
 
-Put the name of the chapter you want to contribute in the [Division of work](https://github.com/aimacode/aima-javascript/issues/27) thread. Please squash all comits into a single comit.
+Put the name of the chapter you want to contribute in the [Division of work](https://github.com/aimacode/aima-javascript/issues/27) thread. Please squash all commits into a single commit. Also see [CONTRIBUTION.md](CONTRIBUTION.md) for know the working status.
