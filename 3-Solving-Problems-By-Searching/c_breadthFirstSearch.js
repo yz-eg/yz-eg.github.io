@@ -11,7 +11,13 @@ var w = 660 ,h = 300;
 var time_interval = 50;
 var interval_function;
 
-
+var finish_traversal = function(dest){
+	curr_node = dest.prev
+	while(!curr_node.is_source){
+		curr_node.f_node.fill='yellow'
+		curr_node = curr_node.prev
+	}
+}
 var visit_node = function(node){
 	node.visited = true
 	if(!curr_node.is_source && !curr_node.is_dest){
@@ -72,8 +78,7 @@ $(document).ready(function(){
 		url : "breadthFirstSearch.js",
 		dataType: "text",
 		success : function (data) {
-			console.log(data);
-			$("#breadthFirstSearchCode").html(data);
+			document.getElementById('breadthFirstSearchCode').innerHTML = data;
 		}
 	});
 
