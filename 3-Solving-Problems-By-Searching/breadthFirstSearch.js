@@ -5,7 +5,7 @@ var get_index = function(x,y,max_row,max_col){
 var breadthFirstSearch = function(){
   // Initialize the queue with the source node
 	var queue = [nodes_list[source_index]];
-  //Set interval function and assign to interval_function
+  //Execute this function till queue is empty or destination is reached
 	interval_function = setInterval(function(){
     //if queue is empty , stop the iteration
 		if(queue.length==0){
@@ -16,20 +16,25 @@ var breadthFirstSearch = function(){
     //visit that node
 		visit_node(curr_node);
     //Check through each of the neighbors of the current node
-		for(var i=0;i<curr_node.neighbors.length;i++){
+		for(var i=0;i < curr_node.neighbors.length;i++){
 			adj_node = nodes_list[curr_node.neighbors[i]];
       //If node is not visited before and not blocked
 			if(!adj_node.visited && !adj_node.is_blocked){
+        //Add the reference to previous node to retrace the path later
+        adj_node.prev = curr_node
         //If the adjacent node is the destination, stop the iteration
 				if(adj_node.is_dest){
 					clearInterval(interval_function,time_interval);
+          //Retrace the path
+          finish_traversal(adj_node)
 				}else{
-          //Push the node to the queue
+          //Push the node to the queue and color it accordingly
 					add_to_queue(queue,adj_node)
 				}
 			}
 		}
-		two.update()
+    //Update the front end visualization
+		two.update();
 	},time_interval);
 }
 var node = function(x,y,max_row,max_col){
