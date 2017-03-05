@@ -2,7 +2,12 @@
 
 ## How to Contribute
 
-Put the name of the chapter you want to contribute in the [Division of work](https://github.com/aimacode/aima-javascript/issues/27) thread. Please squash all commits into a single commit.
+Thanks for considering contributing to `aima-javascript`! Whether you are an aspiring [Google Summer of Code](https://summerofcode.withgoogle.com/organizations/5663121491361792/) student, or an independent contributor, here is a guide to how you can help:
+
+
+- First, read and understand the code to get a feel for the extent and the style.
+- Look at the [issues](https://github.com/aimacode/aima-javascript/issues) and pick one to work on.
+- Choose from the list below. Put the name of the chapter you want to contribute to in the [Division of work](https://github.com/aimacode/aima-javascript/issues/27) thread. Please squash all commits into a single commit.
 
 ## Index of Implemented Algorithms and Section
 
