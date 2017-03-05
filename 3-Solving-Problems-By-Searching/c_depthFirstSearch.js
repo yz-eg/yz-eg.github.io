@@ -104,7 +104,7 @@ $(document).ready(function(){
 	}
 	function init(){
 		canvas = document.getElementById('depthFirstSearchCanvas');
-		canvas.addEventListener('click',clickHandler,false);
+		// canvas.addEventListener('click',clickHandler,false);
 		canvas.innerHTML = "";
 		w = canvas.offsetWidth, h = 300;
 		two = new Two({width:w , height:h}).appendTo(canvas);
@@ -134,6 +134,7 @@ $(document).ready(function(){
 		for(var i = 0; i < problem.ROWS; i++){
 			for(var j = 0; j < problem.COLS; j++){
 				var temp = two.makeRectangle(SIZE/2+j*SIZE,SIZE/2+i*SIZE,SIZE,SIZE);
+				console.log(temp._renderer.elem);
 				if(problem.graph[i][j])
 				temp.fill = BLOCKING;
 				else

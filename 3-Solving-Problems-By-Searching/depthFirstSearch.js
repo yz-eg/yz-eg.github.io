@@ -23,17 +23,13 @@ var depthFirstSearch = function(problem){
     //Add Extracted node to explored
     this.explored[node] = true;
     actions = this.problem.ACTIONS(node)
-    console.log("actions is " + actions);
     for(var i = 0; i < actions.length; i++){
       var action = actions[i];
-      console.log("Current action is "+action);
       child = this.problem.CHILD_NODE(node,action);
-      console.log("Child found is "+child);
       if(!this.explored[child]){
         this.stack.push(child);
         this.explored[child] = true;
       }
-      console.log("Stack is "+this.stack);
     }
     isNewState = true;
     return [isNewState,node]
