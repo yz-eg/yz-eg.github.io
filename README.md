@@ -3,6 +3,8 @@ Javascript implementation of algorithms (and visualizations) from Russell And No
 
 [Click here to go to the static hosted page](http://aimacode.github.io/aima-javascript/)
 
+[Click here to go to the gitter chat lobby](https://gitter.im/aimacode/Lobby)
+
 Some Javascript visualizations that I admire, and would like to see similar kinds of things here:
 - [Red Blob Games: A* Tutorial](http://www.redblobgames.com/pathfinding/a-star/introduction.html)
 - [Qiao Search Demo](https://qiao.github.io/PathFinding.js/visual/)
@@ -44,7 +46,7 @@ To bundle the web app :
 1. Serve `build` folder locally.
 2. Run `gulp bundle`.
 3. Run `gulp copy` to bundle the app into build folder.
-4. Web app in `build` folder. 
+4. Web app in `build` folder.
 
 * Deploy to gh-pages :
 1. Run `gulp bundle`.
@@ -55,7 +57,7 @@ To bundle the web app :
 
 Start a local server, e.g. `python -m SimpleHTTPServer 80` for Python 2.x or `python -m http.server 80` for Python 3.x
 
-Then visit `http://localhost` using your browser. 
+Then visit `http://localhost` using your browser.
 
 **Note : Run local server on ` build` directory after deploying locally.**
 
@@ -68,12 +70,12 @@ This directory contains the minified source code for production deployment.
 The repository has the following structure:
 
 - There is a directory for each chapter
-- Each algorithm will have a `algorithm.js` where the main logic is to be implemented. 
+- Each algorithm will have a `algorithm.js` where the main logic is to be implemented.
 - Each algorithm will also have a `c_algorithm.js` which will have the javascript visualization.
 - The `index.html` will include both the scripts.
 - The `c_algorithm.js` will use AJAX to load `algorithm.js` into `index.html` as plain text for side-by-side reference of the reader.  
-- The `index.html` will also include `main.js` which contains minified version of global scripts like jQuery, angular etc 
-- See the [`index.html`](https://github.com/aimacode/aima-javascript/blob/master/2-Intelligent-Agents/index.html) of [chapter 2](http://ghost---shadow.github.io/aima-javascript/2-Intelligent-Agents/) for reference. 
+- The `index.html` will also include `main.js` which contains minified version of global scripts like jQuery, angular etc
+- See the [`index.html`](https://github.com/aimacode/aima-javascript/blob/master/2-Intelligent-Agents/index.html) of [chapter 2](http://ghost---shadow.github.io/aima-javascript/2-Intelligent-Agents/) for reference.
 
 # Contribution
 
