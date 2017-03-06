@@ -85,7 +85,8 @@ $(document).ready(function(){
 	var state,lastState;
 	var m_frame = DELAY;
 	var tiles = [];
-
+  var isBinded = false;
+	
 	function clickHandler(){
 		two.unbind('update');
 		tiles = [];
