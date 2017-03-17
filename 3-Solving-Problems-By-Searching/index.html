@@ -98,13 +98,80 @@
           </div>
         </div>
 
-
-        <h2>Breadth First Search</h2>
-        <p>Click on the cells to block/unblock the cells and restart the simulation.</p>
-        <div class = "canvas" id="breadthFirstSearchCanvas" height="300px">
+        <p>
+          Now that we know how nodes are expanded and how a search Agent perceives the graph, we are
+          now ready to meet some Search Algorithms. In the above two visualizations, you decided which
+          node to expand next(by clicking on them) but now we shall see some algorithms in action which can
+          decide by themselves which node to expand next.
+        </p>
+        <div class="row">
+          <div class="col-md-6 col-sm-6">
+            <h2>Breadth First Search</h2>
+            <p>In Breadth First Search, the node which was discovered the earliest is expanded next i.e. the node which joined
+            the frontier earlier, is expanded earlier.</p>
+            <p>
+              To achieve this, Breadth First Search Algorithm uses a FIFO(First In First Out) Queue.
+              The following graph is explored by a Breadth First Search Algorithm with 'A' as the initial node.
+            </p>
+          </div>
         </div>
 
-        <pre id="breadthFirstSearchCode"></pre>
+        <div class="row">
+          <div class="col-sm-6 col-md-6">
+              <div class='btn btn-primary' id='bfsRestartButton'>Restart</div>
+              <div class = "canvas" id="breadthFirstSearchCanvas" height="300px">
+            </div>
+          </div>
+          <div class="col-sm-6 col-md-6">
+            <div class="notes">
+              <ul type="none" id='fifoLegend'>
+                <li><div id='fifoWaiting' style="width:15px;height:15px;display: inline-block;"></div> Nodes waiting to be expanded </li>
+                <li><div id='fifoNextNode' style="width:15px;height:15px;display: inline-block;"></div> Node to be expanded next from the queue </li>
+              </ul>
+            </div>
+            <div id="fifoQueueWrapper" style="background-color:hsl(0, 0%, 90%);padding:10px; width:70%;height:100px;margin-top:40px">
+              <center>
+                <h4>FIFO QUEUE</h4>
+                <div id='fifoQueueCanvas'>
+                </div>
+              </center>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6 col-sm-6">
+            <h2>Depth First Search</h2>
+            <p>In Depth First Search, the node which was discovered the latest is expanded next i.e. the node which joined
+            the frontier later, is expanded later.</p>
+            <p>
+              To achieve this, Depth First Search Algorithm uses a LIFO(Last In First Out) Queue.
+              The following graph is explored by a Depth First Search Algorithm with 'A' as the initial node.
+            </p>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-6 col-md-6">
+              <div class='btn btn-primary' id='dfsRestartButton'>Restart</div>
+              <div class = "canvas" id="depthFirstSearchCanvas" height="300px">
+            </div>
+          </div>
+          <div class="col-sm-6 col-md-6">
+            <div class="notes">
+              <ul type="none" id='lifoLegend'>
+                <li><div id='lifoWaiting' style="width:15px;height:15px;display: inline-block;"></div> Nodes waiting to be expanded </li>
+                <li><div id='lifoNextNode' style="width:15px;height:15px;display: inline-block;"></div> Node to be expanded next from the queue </li>
+              </ul>
+            </div>
+            <div id="lifoQueueWrapper" style="background-color:hsl(0, 0%, 90%);padding:10px; width:70%;height:100px;margin-top:40px">
+              <center>
+                <h4>LIFO QUEUE</h4>
+                <div id='lifoQueueCanvas'>
+                </div>
+              </center>
+            </div>
+          </div>
+        </div>
 
         <h2>Uniform Cost Search</h2>
         <p>Click on the canvas to restart the simulation</p>
@@ -112,13 +179,6 @@
         </div>
 
         <pre id="uniformCostSearchCode"></pre>
-
-        <h2>Depth First Search</h2>
-        <p>Click on the cells to block/unblock the cells and restart the simulation.</p>
-        <div class = "canvas" id="depthFirstSearchCanvas" height="300px">
-        </div>
-
-        <pre id="depthFirstSearchCode"></pre>
 
         <h2>Depth Limited Search</h2>
         <p>Click on the canvas to restart the simulation</p>

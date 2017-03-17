@@ -1,4 +1,4 @@
-var nodeExpansionAgent= function(adjMatrix,initial){
+function nodeExpansionAgent(adjMatrix,initial){
   this.adjMatrix = adjMatrix;
 
   this.UNEXPLORED = 0;
@@ -20,8 +20,8 @@ var nodeExpansionAgent= function(adjMatrix,initial){
 
   this.getNeighbors = function(node){
     var neighbors = []
-    for(var i=0; i < this.adjMatrix[node] ; i++){
-      if(this.adjMatrix[node][i]){
+    for(var i=0; i < this.adjMatrix[node].length ; i++){
+      if(this.adjMatrix[node][i] == 1){
         neighbors.push(i);
       }
     }
