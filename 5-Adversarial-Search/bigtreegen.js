@@ -162,11 +162,19 @@ function minimax(tree) {
 	active.push([tree.id, best])
 	
 	function remove(node) {
-		active = active.filter(id => id[0] != node.id)
-		let ele = active.find(id => id[0] == node.id)
-		active.push([node.id, 4])
-		for(let i = 0; i < node.children.length; i++)
-			remove(node.children[i])
+		let s = undefined
+		let ele = active.find(id => id[0] == node.id);
+		switch(ele[1]) {
+			case 0: s = 3; break;
+			case 1: s = 4; break;
+			case 2: s = 5; break;
+			default: s = 4; break;
+		}
+		active = active.filter(id => id[0] != node.id);
+		active.push([node.id, s]);
+		for(let i = 0; i < node.children.length; i++) {
+			remove(node.children[i]);	
+		}
 	}
 	for(let i = 0; i < tree.children.length; i++) {
 		if(i == which)
@@ -186,6 +194,7 @@ function alphabeta(tree, alpha, beta) {
 	let value = evaluate(tree)
 	abactive.push([tree.id, value])
 	abresults.push(abactive.slice(0))
+	//console.log(abactive);
 	if (value != undefined) {
 		return value
 	}
@@ -207,20 +216,41 @@ function alphabeta(tree, alpha, beta) {
 			break
 	}
 
-	function remove(tree) {
-		abactive = abactive.filter(id => id[0] != tree.id)
-		for(let i = 0; i < tree.children.length; i++)
-			remove(tree.children[i])
+	abactive = abactive.filter(id => id[0] != tree.id);
+	abactive.push([tree.id, best]);
+	//console.log(abactive)
+
+	function remove(node) {
+
+		let s = undefined
+		let ele = abactive.find(id => id[0] == node.id);
+		if (ele != undefined) {
+			switch(ele[1]) {
+				case 0: s = 3; break;
+				case 1: s = 4; break;
+				case 2: s = 5; break;
+				case 6: s = 6; break;
+				default: s = null; break;
+			}
+		}
+		else {
+			s = 6;
+		}
+		//console.log(s)
+		abactive = abactive.filter(id => id[0] != node.id);
+		abactive.push([node.id, s]);
+		for(let i = 0; i < node.children.length; i++) {
+			remove(node.children[i]);
+		}
 	}
 	for(let i = 0; i < tree.children.length; i++) {
 		if(i == which)
 			continue
 		remove(tree.children[i])
 	}
-	abactive = abactive.filter(id => id[0] != tree.id)
-	abactive.push([tree.id, best])
-	abresults.push(abactive.slice(0))
-	return best
+	abresults.push(abactive.slice(0));
+	//console.log(abactive);
+	return best;
 }
 alphabeta(new Tree(new Board([0,0,-1,1,0,0,1,-1,1], -1), 5), -1, 4)
 
@@ -253,9 +283,10 @@ function alphabetaR(tree, alpha, beta) {
 	}
 
 	function remove(tree) {
-		abactiveR = abactiveR.filter(id => id[0] != tree.id)
-		for(let i = 0; i < tree.children.length; i++)
-			remove(tree.children[i])
+		abactiveR = abactiveR.filter(id => id[0] != tree.id);
+		for(let i = 0; i < tree.children.length; i++) {
+			remove(tree.children[i]);
+		}
 	}
 	for(let i = 0; i < tree.children.length; i++) {
 		if(i == which)
@@ -270,11 +301,103 @@ function alphabetaR(tree, alpha, beta) {
 
 alphabetaR(new Tree(new Board([0,0,-1,1,0,0,1,-1,1], -1), 5), -1, 4)
 
-let res_str =  "let states = " + JSON.stringify(results) + "\nlet abstates = " + JSON.stringify(abresults)  + "\nlet abstatesR = " + JSON.stringify(abresultsR)
+let iabresults = []
+let iabactive = []
+
+function iter(tree, alpha, beta) {
+	function ialphabeta(tree, alpha, beta, depth, first_picks) {
+		//return leaves
+		let value = evaluate(tree);
+		if (value == undefined && depth == 0) {
+			value = 1;
+		}
+		iabactive.push([tree.id, value]);
+		iabresults.push(iabactive.slice(0));
+
+		if (value != undefined) {
+			return { 'val': value, 'best_moves':[]};
+		}
+			
+		let best = { 'val': (tree.board.turn == 1 ? -1 : 4), 'best_moves': [] };
+		let which = 0;
+
+		//choose the best options first
+		let first = undefined
+		if (first_picks.length > 0) {
+			first = first_picks[0];
+			let result = ialphabeta(tree.children[first], alpha, beta, depth-1, first_picks.slice(1));
+			best = result;
+			which = first;
+			if (tree.board.turn == 1) {
+				alpha = result.val;
+			} else {
+				beta = result.val;
+			}
+		}
+		
+		//evaluate the rest of the children
+		for(let i = 0; i < tree.children.length; i++) {
+			if (alpha > beta) {
+				break;
+			}
+			if (i == first) {
+				continue;
+			}
+			let result = ialphabeta(tree.children[i], alpha, beta, depth-1, []);
+			if (tree.board.turn == 1 ? result.val >= best.val : result.val <= best.val) {
+				best = result;
+				which = i;
+				if (tree.board.turn == 1) {
+					alpha = result.val;
+				} else {
+					beta = result.val;
+				}
+			}
+		}
+		iabactive = iabactive.filter(id => id[0] != tree.id)
+		iabactive.push([tree.id, best.val])
+		function remove(node) {
+			iabactive = iabactive.filter(id => id[0] != node.id)
+			let ele = iabactive.find(id => id[0] == node.id)
+			iabactive.push([node.id, 4])
+			for(let i = 0; i < node.children.length; i++)
+				remove(node.children[i])
+		}
+		for(let i = 0; i < tree.children.length; i++) {
+			if(i == which)
+				continue
+			remove(tree.children[i]);
+		}
+		iabresults.push(iabactive.slice(0));
+
+		best.best_moves.unshift(which)
+		return best; 
+	}
+	function set_tree(tree, moves) {
+		iabactive.push([tree.id, 5]);
+		if (moves.length == 0) {
+			return;
+		}
+		set_tree(tree.children[moves[0]], moves.slice(1));
+	}
+	let best_moves = [];
+	for(let i = 1; i < 5; i++) {
+		let result = ialphabeta(tree, alpha, beta, i, best_moves.slice(0));
+		best_moves = result.best_moves;
+		iabactive = [];
+		if (best_moves.length > 0) {
+			set_tree(tree, best_moves.slice());
+		}
+	}
+}
+
+iter(new Tree(new Board([0,0,-1,1,0,0,1,-1,1], -1), 5), -2, 5)
+let res_str =  "let states = " + JSON.stringify(results) + "\nlet abstates = " + JSON.stringify(abresults)  + "\nlet abstatesR = " + JSON.stringify(abresultsR) + "\nlet iabstates = " + JSON.stringify(iabresults);
 
 let fs = require('fs');
-fs.writeFile("Aimacode/Chapter5/states.js", res_str, function(err) {
-	if(err)
-		return console.log(err)
-    console.log("The file was saved!")
-})
+fs.writeFile("C:\\Users\\MHK\\Documents\\ai\\New folder\\aima-javascript\\5-Adversarial-Search\\states.js", res_str, function(err) {
+	if(err) {
+		return console.log(err);
+	}
+    console.log("The file was saved!");
+});

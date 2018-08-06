@@ -1,28 +1,3 @@
-/**
- * @param {Tree} tree
- * @param {Number} lx
- */
-
-function equip_graphics(tree, lx, ux, y, d, canvas) {
-    tree.graphic = new BoardGraphic(tree.board, (ux - lx)/2 + lx, y, canvas)
-    if (1 == d)
-        return
-    tree.branches = []
-    for(let i = 0; i < tree.children.length; i++) {
-        let new_lx = (ux - lx)/tree.children.length*(i+1)+lx
-        let new_ux = (ux - lx)/tree.children.length*i+lx
-        equip_graphics(tree.children[i], new_ux, new_lx, y + 35, d-1, canvas)
-        let bra = draw_line((ux - lx)/2 + lx, y+10, (new_ux - new_lx)/2 + new_lx, y+25, canvas)
-        tree.branches.push(bra)
-        tree.children[i].pbranch = bra
-    }
-    tree.circle = document.createElementNS("http://www.w3.org/2000/svg", 'circle')
-    canvas.appendChild(tree.circle)
-    tree.circle.setAttribute('cx', (ux - lx)/2 + lx)
-    tree.circle.setAttribute('cy', y+10)
-    tree.circle.setAttribute('r', '0')
-    tree.circle.setAttribute('fill', 'red')
-}
 function recurive() {
     let scale = 200
 	let div = document.getElementById("recursiveCanvas")
@@ -30,7 +5,7 @@ function recurive() {
     canvas.setAttribute('viewBox', '0 0 ' + scale + ' ' + scale/2 + ' ')
     div.appendChild(canvas)
 	let tree = new Tree(new Board([1,-1,0,1,-1,-1,0,1,0], -1), 2)
-    equip_graphics(tree, 0, scale, 12, 3, canvas)
+    equip_graphics(tree, 0+10, scale-10, 12, 3, canvas)
     function setup(tree) {
 		let color = 'hsl(0,0%,50%)'
 		for (let i = 0; i < 9; i++) {

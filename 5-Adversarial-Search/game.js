@@ -9,11 +9,11 @@ function game(){
 	let width = 2
 	let div = document.getElementById("gameCanvas")
 	let canvas = document.createElementNS("http://www.w3.org/2000/svg", 'svg')
-	canvas.setAttribute('style', 'width: 60%; margin: auto;')
+	canvas.setAttribute('style', 'width: 40%; float: right; margin: 0% 5% 5% 5%;')
     div.appendChild(canvas)
     canvas.setAttribute('viewBox', '0 0 ' + scale + ' ' + scale + ' ')
 	let textele = document.createElementNS('http://www.w3.org/2000/svg','text')
-    let textnode = document.createTextNode("")
+    let textnode = document.createTextNode("Make a move!")
     textele.setAttribute('x', '50%')
     textele.setAttribute('y', '50%')
     textele.setAttribute('alignment-baseline', 'middle')
@@ -34,7 +34,6 @@ function game(){
 
 	async function reset() {
 		return new Promise(async (resolve) => {
-			console.log(tree.board.gameState)
 			textnode.nodeValue = (tree.board.gameState == 2 ? "X Wins" : "Draw")
 			await sleep(2000)
 			tree = new Tree(new Board([0,0,0,0,0,0,0,0,0], 1), 100)
@@ -79,21 +78,26 @@ function game(){
 		cross.setAttribute('stroke-width', width)
 		cross_marks.push(cross)
 		button.onclick = async ()=> {
-			if (tree.board.tiles[i] != 0 || clickable == false)
-				return
-			clickable = false
+			if (tree.board.tiles[i] != 0 || clickable == false) {
+				return;
+			}
+			clickable = false;
+			textnode.nodeValue = "";
 			let count = 0;
 			for(let j = 0; j < i; j++) {
-				if (tree.board.tiles[j] == 0)
+				if (tree.board.tiles[j] == 0) {
 					count++;
+				}
 			}
 			circle.setAttribute('class','gameapp')
-			tree = tree.children[count]
+			tree = tree.children[count];
+			//console.log(tree.board.gameState)
 			if(tree.board.gameState != 0) {
 				await reset()
 				return
 			}
-			let move = minimax(tree)[1]
+			let move = tree.best();
+
 			let location = 0
 			count = -1;
 			for(let j = 0; j < 9; j++) {
@@ -106,7 +110,8 @@ function game(){
 			}
 			await sleep(1000)
 			cross_marks[location].setAttribute('class','gameapp')
-			tree = tree.children[move]
+			tree = tree.children[move];
+			//console.log(tree.board.gameState);
 			if(tree.board.gameState != 0) {
 				await reset()
 			}

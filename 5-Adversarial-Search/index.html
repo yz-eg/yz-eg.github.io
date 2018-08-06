@@ -1,11 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<meta charset="UTF-8">
 	<title>Adversarial Search Prototype</title>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/two.js/0.6.0/two.js"></script>
-	<script src=	"https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
 	<script src="banner.js"></script>
-	<script src="board.js"></script>
 	<script src="tree.js"></script>
 	<script src="draw.js"></script> 
 	<script src="game.js"></script>
@@ -16,9 +14,13 @@
 	<script src="bigtree.js"></script>
 	<script src="transition.js"></script>
 	<script src="parallax2.js"></script>
-	<script src="alphabeta.js"></script>
+	<script src="nalphabeta.js"></script>
+	<script src="badtree.js"></script>
+	<script src="deepening.js"></script>
+	<script src="comparison.js"></script>
 	<script src="main.js"></script>
 	<style>
+		
 		* {
 			padding: 0px;
 			margin: 0px;
@@ -26,6 +28,7 @@
 		body {
 			font-family: arial;
 			background-color: hsl(60,5%,95%);
+			min-width: 800;
 		}
 		#banner-container {
 			width: 100%;
@@ -39,13 +42,20 @@
 			
 		}
 		#wintext {
-			font-size: 1.3em;	
-			fill:hsl(0,0%,100%);
+			font-size: 0.83em;	
+			fill:hsl(0,0%,90%);
 			stroke: hsl(0, 0%, 0%);
-			stroke-width: 1.2;
+			stroke-width: 0.05em;
 			pointer-events: none;
 			font-weight: 900;
+			animation: pulse 3s infinite;
 		}
+		@keyframes pulse {
+    		0% {font-size: 0.83em;}
+    		50% {font-size: 0.79em;}
+			100% {font-size: 0.83em;}
+		}
+
 		#wintextgt {
 			font-size: 0.6em;	
 			fill:hsl(0,0%,100%);
@@ -189,6 +199,13 @@
 		#transitionButton:hover {
 			box-shadow: 0px 0px;
 		}
+		.abp {
+			stroke-width: 0.04em;
+			stroke: black;
+			fill: hsl(240,50%,70%);
+			font-weight: 900;
+			font-size: 0.5em;
+		}
 	</style>
 </head>
 <body onload="main()">
@@ -196,20 +213,17 @@
 		<svg id="banner" viewBox="0 0 300 90"></svg>
 	</div>
 	<div class="content-container">
-		<div class="grid">
-			<div id='gameText' class="text">
-				Tic-tac-toe is a fairly simple game. Each player takes a turn marking a square, and the first player to claim 3 in a line wins. A computer is very good at this game, and won’t ever get anything worse than a draw. But how does it to it?
-			</div>
-			<div class="figures" id="gameCanvas"></div>
-		</div>
-		
-		<div id='gameTreeText' class="text">
-			We need a way to represent this problem before we can try to have a computer solve it. Trees can work well because we can enumerate every move and its resulting state. Make a move to see how we traverse the tree.
+		<div class="figures" id="gameCanvas"></div>
+		<div class="text">
+			Tic-tac-toe is a fairly simple game. Each player takes a turn marking a square, and the first player to claim 3 in a line wins. A computer is very good at this game, and won’t ever get anything worse than a draw. Give it a try!
+			<br>
+			<br>
+			But how does it do it? We need a way to represent this problem before we can try to have a computer solve it. Trees can work well because we can enumerate every move and its resulting state. Make a move to see how we traverse the tree.
 		</div>
 
 		<div class="figures" id="gameTreeCanvas"></div>
 		
-		<div class="text">In addition to this we’re going to use an evaluation function, a heuristic, to help us solve this problem. Our evaluation function will assign states that X wins a value of ∞, draw states a value of 0, and states that O wins a value of -∞. Our goal is to choose the state with the highest value.</div>
+		<div class="text">In addition to this we’re going to use an evaluation function, a heuristic, to help us solve this problem. Our evaluation function will assign states that X wins a value of 1, draw states a value of 0, and states that O wins a value of -1. Our goal is to choose the state with the highest value.</div>
 		
 		
 		<div class="grid">
@@ -234,16 +248,15 @@
 
 		<div class="figures" id="recursiveCanvas"></div>
 
+
+		
 		<div id='bigtreeText' class="text">
 			When O tries to decide what move to make, O can also assume that X will pick the best option for themselves. But what is the best move for X? Now we're back to the same place we started, searching for the best move X can make, only deeper into the tree. We could stop any time, but our results will be more reliable the deeper we go. Here is the same tree, but we evaluate each node in order.
 		</div>
 	</div>
-	
-		<div class="figures" id="bigtreeCanvas">
-		</div>
-		
-		<div style="text-align: center;"><input style="width: 60%;" type="range" min="0" max="141" value="0" class="slider" id="bigtreeRange"></div>
-
+	<div id="bigtreeContainer" style="height: 200em;">
+		<div class="figures" id="bigtreeCanvas"></div>
+	</div>
 	<div class="content-container">
 		<div id='transitionText' class="text">
 			This is the essence of the Minimax algorithm, which is the foundation of many powerful techniques. It is a very exhaustive algorithm, so it will try to evaluate every node in a tree if you allow it to. This can be a problem, as trees can have explosive growth. Depending on a game’s branching factor(possible plays in a turn) and how many layers(turns) deep into the tree you want to look, the problem can quickly become unmanageable.
@@ -254,34 +267,78 @@
 		</div>
 		<div class="figures" id="transitionCanvas"></div>
 	
+		<div class="text">We can account for this by keeping track of the best and worst case scenario.
+			</div>
 		<div class="grid">
 			<div id='parallax2Text' class="text">
 				<div></div>
 				<div id="parallax2_text1">
-					We can account for this by keeping track of the best and worst case scenario.
+					We store the best and worst options we find in α and β. We start by filling them with two extreme values so that we don't discard our first options. 
+				</div>
+				<div id="parallax2_text2">
+					The first option has a value of 1!
+				</div>
+				<div id="parallax2_text3">
+					Now we return to our parent. It's the root player's choice so we compare it with α and find that the value we found is better, so we update it.
+				</div>
+				<div id="parallax2_text4">
+					Now we start looking at the next child. We pass the current node's α and β to it.
+				</div>
+				<div id="parallax2_text5">
+					This node isn't a leaf/terminal node, so we look at it's children as well. We find that the first one has a value of 0!
+				</div>
+				<div id="parallax2_text6">
+					Because the opposing player picks the move on this node, we compare it with β, and find it to be better(worse for us), so we update it. However we notice that α is now greater than β. This means that in the best case for us, this branch is already worse(0) than another option(1) that we've already found. We now have no reason to keep looking into this branch.
 				</div>
 			</div>
 			<div id="parallax2Canvas"></div>
 		</div>
 
 		<div class="text" id="alphabetaText">
-			This will give us identical results to Minimax, but will give us vastly better performance.
+			This will give us identical results to Minimax, but can give us vastly better performance.
 		</div>
-		<select id="alphabetaSelect">
-			<option value="1">Alpha Beta</option>
-			<option value="2">Reverse Alpha Beta</option>
-			<!--<option value="3">Minimax</option>-->
-		</select>
 	</div>
 
-	<div class="figures" id="alphabetaCanvas"></div>
-	
-	<div style="text-align: center;"><input style="width: 60%;" type="range" min="0" max="141" value="0" class="slider" id="alphabetaRange"></div>
+		<div id="abparaContainer" style="height: 200em;">
+			<div class="figures" id="alphabetaCanvas"></div>
+		</div>
+
 	<div class="content-container">
+		<div style="text-align: center; display: none;">
+			<input style="width: 60%;" type="range" min="0" max="141" value="0" class="slider" id="alphabetaRange"></div>
 		<div class="text">
 			One thing to keep in mind is that alpha beta cannot guarantee that we’ll get better performance. The order in which things are evaluated makes a huge difference. We're lucky because the most valueable move is found first, but it's perfectly plausible that we'll evaluate moves in increasing value, meaning that we could see little to no performance increase.
 		</div>
 	</div>
+	<div id="badtreeContainer" style="height: 200em;">
+		<div class="figures" id="badtreeCanvas"></div>
+	</div>
+	<div class="content-container">
+		<div class="text">
+			Luckily there are a few things that we use to help us avoid this problems. One solution is to pick a random move each turn. Doing that can help us avoid falling into obvious patterns, which may have helped us in the above example. Heuristics can also help us. For example, in chess, moves that lead to captures will often be a good indicator of which move to pick. Finally, we can also employ iterative deepening, choosing to expand the path leading to the most valuable state first, as previous states are a good indicator of future states. This encours a slight overhead, but it’s often worth it in larger trees. Here is an example of it in action:
+		</div>
+	</div>
+	<div id="deepeningContainer" style="height: 200em;">
+		<div class="figures" id="deepeningCanvas"></div>
+	</div>
+	<div class="content-container">
+	<!--
+	<div class="text">
+		Here is a comparison of techniques used, and how many nodes they end up visiting.
+	</div>
+	
+	<canvas id="comparisonCanvas"></canvas>
+	<div style="text-align:center;">
+		<button type="button" class="button" id="playButton">Start Search</button>
+	</div>
+	-->
+	<div class="text">
+		There is almost no reason not to use alpha beta pruning over minimax, but your choice of branch ordering can have a massive effect on the outcome. Which one is best depends on your specific game.
+	</div>
+
+
+	</div>
+
 	
 	<div id="footer"></div>
 </body>
