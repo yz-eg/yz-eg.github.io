@@ -1,367 +1,373 @@
-function comparison() {
-    let canvas = document.getElementById("comparisonCanvas");
-    let canvasWidth = 1000;
-    let canvasHeight = 1000;
-    canvas.setAttribute("height", canvasHeight + "px");
-    canvas.setAttribute("width",  canvasWidth+"px");
-    canvas.setAttribute("style", "width: 100%; height: 40vw; margin: auto; display:block;");
-    let ctx = canvas.getContext("2d");
-
-    ctx.beginPath();
-    ctx.moveTo(500,0);
-    ctx.lineTo(500,1000);
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.moveTo(0,500);
-    ctx.lineTo(1000,500);
-    ctx.stroke();
-
-    let res = 25;
-    let graph = [];
-    
-    for(let i = 0; i < res; i++) {
-        graph.push(new Array(res));
-        for(let j = 0; j < res; j++) {
-            if(Math.random() < 0.8) {
-                graph[i][j] = [];
-            } else {
-                graph[i][j] = undefined;
-            }
+class GraphNode {
+    constructor(x, y, size, win, self, leaf) {
+        this.x = x;
+        this.y = y;
+        this.children = [];
+        if (leaf) {
+            this.value = Math.sqrt(Math.pow(win[0] - self[0], 2) + Math.pow(win[1] - self[1], 2)) / Math.sqrt(Math.pow(size, 2) + Math.pow(size, 2));
+        } else {
+            this.value = undefined;
         }
     }
+    draw(ctx, x, y) {
+        ctx.beginPath();
+        ctx.lineWidth = 1;
+        ctx.arc(this.x+x,
+            this.y+y,
+            3.5,
+            0,2*Math.PI);
+        ctx.fillStyle = 'hsl(0,0%,70%)';
+        ctx.fill();
+        ctx.strokeStyle = 'hsl(0,0%,70%)';
+        ctx.stroke();
 
-    for(let i = 0; i < res; i++) {
-        for(let j = 0; j < res; j++) {
-            if (graph[i][j] != undefined) {
-                /*
-                if (i < 24 && graph[i+1][j] != undefined) {
-                    graph[i][j].push([i+1, j]);
-                }
-                if (i < 24 && j < 24 && graph[i+1][j+1] != undefined) {
-                    graph[i][j].push([i+1, j+1]);
-                }
-                if (i > 0 && j < 24 && graph[i-1][j+1] != undefined) {
-                    graph[i][j].push([i-1, j+1]);
-                }
-                if (j < 24 && graph[i][j+1] != undefined) {
-                    graph[i][j].push([i, j+1]);
-                }
-                */
-                /*
-                if (i < 24 &&  j > 0 && graph[i+1][j-1] != undefined) {
-                    graph[i][j].push([i+1, j-1]);
-                }
-                
-                if (j > 0 && graph[i][j-1] != undefined) {
-                    graph[i][j].push([i, j-1]);
-                }
-                if (i > 0 && graph[i-1][j] != undefined) {
-                    graph[i][j].push([i-1, j]);
-                }
-               
-                if (i > 0 &&  j > 0 && graph[i-1][j-1] != undefined) {
-                    graph[i][j].push([i-1, j-1]);
-                }
-                */
-            }
+        for(let i = 0; i < this.children.length; i++) {
+            ctx.beginPath();
+            ctx.lineWidth = 0.7;
+            ctx.moveTo(this.x+x,this.y+y);
+            ctx.lineTo(this.children[i].x+x,this.children[i].y+y);
+            ctx.stroke();
         }
     }
-
-    for(let i = 0; i < res; i++) {
-        for(let j = 0; j < res; j++) {
-            if (graph[i][j] != undefined && graph[i][j].length != 0) {
-                ctx.rect(i*canvasWidth/res/2+3, j*canvasHeight/res/2+3, 3, 3);
-                ctx.stroke();
-                for(let k = 0; k < graph[i][j].length; k++) {
-                    ctx.beginPath();
-                    ctx.moveTo(i*canvasWidth/res/2+3,j*canvasHeight/res/2+3);
-                    ctx.lineTo(graph[i][j][k][0]*canvasWidth/res/2+3,graph[i][j][k][1]*canvasWidth/res/2+3);
-                    ctx.stroke();
-                }
-            }
-        }
+    add(other) {
+        this.children.push(other);
     }
-    
-    /*
-        function setup() {
-            function evaluate(tree) {
-                switch (tree.board.gameState) {
-                    case 1: return 2
-                    case 2: return 0
-                    case 3: return 1
-                    case 0: return undefined
-                    default: return undefined
-                }
-            }
-            let graph = []
-            let g1 = 0;
-            let g2 = 0;
-            let g3 = 0;
-            let g4 = 0;
-            function shuffle(a) {
-                let j, x, i;
-                for (i = a.length - 1; i > 0; i--) {
-                    j = Math.floor(Math.random() * (i + 1));
-                    x = a[i];
-                    a[i] = a[j];
-                    a[j] = x;
-                }
-                return a;
-            }
-            function draw_node(x, y, color) {
-                ctx.beginPath();
-                ctx.arc(x, y, 5, 0, 2 * Math.PI, false);
-                ctx.fillStyle = color;
-                ctx.fill();
-                ctx.lineWidth = 1;
-                ctx.strokeStyle = color;
-                ctx.stroke();
-            }
-            function update_count(offsetx, offsety, count) {
-                let x = 500;
-                let y = 40;
-                ctx.fillStyle="hsl(60,5%,95%)";
-                //ctx.fillStyle="red";
-                ctx.fillRect(x+offsetx,y+offsety-30,280,35); 
 
-                ctx.fillStyle = 'hsl(0,0%,25%)';
-                ctx.font = "30px Arial";
-                ctx.textAlign="left"; 
-                ctx.fillText("Nodes Visitied: " + count,x+offsetx,y+offsety);
+    mark(ctx, x, y, color = 'hsl(0,50%,50%)') {
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 0.1;
+        ctx.beginPath();
+        ctx.arc(this.x+x,
+            this.y+y,
+            3.5,
+            0,2*Math.PI);
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.lineWidth = 0;
+        ctx.stroke();
+    }
+}
+class Graph {
+    constructor(scale, nodes) {
+        //construct nodes
+        this.buckets = [];
+        let xd = Math.floor(Math.sqrt(nodes));
+        let win = [Math.floor(Math.random() * xd), Math.floor(Math.random() * xd)];
+        let res = scale/xd;
+        for(let i = 0; i < xd; i++) {
+            let row = [];
+            for(let j = 0; j < xd; j++) {
+                row.push(new GraphNode(i*res + 5 + Math.random()*(res-5), j*res + 5 + Math.random()*(res-5), xd, win, [i, j], (i == 0 ||  i == xd-1 || j == 0 || j == xd-1)));
             }
-            async function minimax(index) {
-                let node = graph[index];
-                update_count(0,0,++g1);
-                draw_node(node[1], node[2], 'hsl(0,100%,50%)');
-                for(let i = 0; i < node[3].length; i++) {
-                    await sleep(500);
-                    await minimax(node[3][i]);
-                }
-            }
-            async function alphabetaX(index, alpha, beta, r) {
-                let node = graph[index];
-                draw_node(node[1]+( r ? 0 : 800), node[2]+( r ? 250 : 0), 'hsl(0,100%,50%)');
-                update_count(( r ? 0 : 800),( r ? 250 : 0),(r ? ++g3 : ++g2));
-                if (node[3].length == 0) {
-                    return node[0];
-                }
-                let best = 4;
-                for(let i = ( r ? node[3].length-1 : 0); ( r ? i >= 0 :i < node[3].length); ( r ? i-- : i++)) {
-                    await sleep(500);
-                    let result = await alphabetaO(node[3][i], alpha, beta, r);
-                    if (result <= best) {
-                        best = result;
-                    }
-                    if (result <= beta) {
-                        beta = result;
-                    }
-                    if (alpha >= beta) {
-                        break;
-                    }
-                }
-                return best;
-            } 
-            async function alphabetaO(index, alpha, beta, r, color) {
-                let node = graph[index];
-                draw_node(node[1]+( r ? 0 : 800), node[2]+( r ? 250 : 0), 'hsl(0,100%,50%)');
-                update_count(( r ? 0 : 800),( r ? 250 : 0),(r ? ++g3 : ++g2));
-                if (node[3].length == 0) {
-                    return node[0];
-                }
-                let best = -1;
-                for(let i = ( r ? node[3].length-1 : 0); ( r ? i >= 0 :i < node[3].length); ( r ? i-- : i++)) {
-                    await sleep(500);
-                    let result = await alphabetaX(node[3][i], alpha, beta, r);
-                    if (result >= best) {
-                        best = result;
-                    }
-                    if (result >= alpha) {
-                        alpha = result;
-                    }
-                    if (alpha >= beta) {
-                        break;
-                    }
-                }
-                return best;
-            }
-            function ialphabetaX(index, alpha, beta, depth, color, first_picks) {
-                return new Promise(async (resolve) => {
-                //console.log('X depth', depth);
-                //console.log(index, alpha, beta, depth, color, first_picks);
-                let node = graph[index];
-                update_count(800,250,++g4);
-                draw_node(node[1]+800, node[2]+250, color);
-                if (node[3].length == 0 || depth == 0) {
-                    resolve([node[0], []]);
-                    return;
-                }
-                let first = undefined;
-                let which = 0;
-                let best = [4,[]];
-                if (first_picks.length > 0) {
-                    first = first_picks[0];
-                    best = await ialphabetaO(node[3][first], alpha, beta, depth-1, color, first_picks.slice(1));
-                    alpha = best[0];
-                    which = first;
-                }
-                for(let i = 0; i < node[3].length; i++) {
-                    await sleep(500);
-                    if (i == first) {
-                        continue;
-                    }
-                    let result = await ialphabetaO(node[3][i], alpha, beta, depth-1, color, []);
-                    if (result[0] <= best[0]) {
-                        best = result;
-                        which = i;
-                    }
-                    if (result[0] <= beta) {
-                        beta = result[0];
-                    }
-                    if (alpha >= beta) {
-                        break;
-                    }
-                }
-                best[1].unshift(which);
-                resolve(best);
-            });
-            }
-            function ialphabetaO(index, alpha, beta, depth, color, first_picks) {
-                return new Promise(async (resolve) => {
-                //console.log('O depth', depth);
-                //console.log(index, alpha, beta, depth, color, first_picks);
+            this.buckets.push(row);
+        }
+        this.start = this.buckets[xd/2][xd/2];
+        this.buckets[xd/2][xd/2].children.push(this.buckets[xd/2-1][xd/2-1]);
+        this.buckets[xd/2][xd/2].children.push(this.buckets[xd/2-1][xd/2]);
+        this.buckets[xd/2][xd/2].children.push(this.buckets[xd/2-1][xd/2+1]);
+        this.buckets[xd/2][xd/2].children.push(this.buckets[xd/2][xd/2+1]);
+        this.buckets[xd/2][xd/2].children.push(this.buckets[xd/2+1][xd/2+1]);
+        this.buckets[xd/2][xd/2].children.push(this.buckets[xd/2+1][xd/2]);
+        this.buckets[xd/2][xd/2].children.push(this.buckets[xd/2+1][xd/2-1]);
+        this.buckets[xd/2][xd/2].children.push(this.buckets[xd/2][xd/2-1]);
 
-                //console.log('a');
-                let node = graph[index];
-                update_count(800,250,++g4);
-
-                draw_node(node[1]+800, node[2]+250, color);
-                if (node[3].length == 0 || depth == 0) {
-                    //console.log('b');
-                    resolve([node[0], []]);
-                    return;
-                }
-                let first = undefined;
-                let which = 0;
-                let best = [-1,[]];
-                if (first_picks.length > 0) {
-                    //console.log('c');
-                    first = first_picks[0];
-                    best = await ialphabetaX(node[3][first], alpha, beta, depth-1, color, first_picks.slice(1));
-                    alpha = best[0];
-                    which = first;
-                }
-                for(let i = 0; i < node[3].length; i++) {
-                    //console.log('O ' + i);
-                    await sleep(500);
-                    if (i == first) {
-                        continue;
-                    }
-                    let result = await ialphabetaX(node[3][i], alpha, beta, depth-1, color, []);
-                    if (result[0] >= best[0]) {
-                        best = result;
-                        which = i;
-                    }
-                    if (result[0] >= alpha) {
-                        alpha = result[0];
-                    }
-                    if (alpha >= beta) {
-                        break;
-                    }
-                }
-                best[1].unshift(which);
-
-                resolve(best);
-            });
-            }
-            async function iterative() {
-                let colors = ['red', 'purple', 'blue', 'green', 'yellow'];
-                let best = [];
-                for(let i = 0; i < colors.length; i++) {
-                // console.log('main ' + i)
-                    let result = await ialphabetaO(graph.length-1, Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, i+1, colors[i-1], best);
-                    if (result[0] == 3) {
-                        break;
-                    }
-                    best = result[1];
-                }
-            }
-            let choices = shuffle([0, 1, 2, 3, 4, 5, 6, 7, 8])
-            let choice1 = choices.pop();
-            let choice2 = choices.pop();
-            let choice3 = choices.pop();
-            let choice4 = choices.pop();
-            let tiles = [0,0,0,0,0,0,0,0,0];
-            tiles[choice1] = 1;
-            tiles[choice2] = 1;
-            tiles[choice3] = -1;
-            tiles[choice4] = -1;
-            let tree = new Tree(new Board(tiles, 1), 9)
-            function make_graph(lx, ux, y, inc, node) {
-                let result = [evaluate(node), (ux-lx)/2+lx, y, []];
-                let b = node.children.length; 
-                for(let i = 0; i < b; i++) {
-                    let nux = (ux - lx)/b*(i+1)+lx;
-                    let nlx = (ux - lx)/b*i+lx;
-                    result[3].push(make_graph(nlx, nux, y+inc, inc*1.08, node.children[i]));
-                }
-                graph.push(result);
-                return graph.length-1;
-            }
-            make_graph(5, 795, 60, 30, tree);
-            function draw_graph(offsets) {
-                //set up board
-                {
-                    ctx.beginPath();
-                    ctx.lineWidth="3";
-                    ctx.strokeStyle="hsl(0,0%,25%)";
-                    ctx.rect(1,1,canvas.width-2,canvas.height-2); 
-                    ctx.stroke();
-            
-                    ctx.beginPath();
-                    ctx.moveTo(800,0);
-                    ctx.lineTo(800,1000);
-                    ctx.stroke();
-            
-                    ctx.beginPath();
-                    ctx.moveTo(0,248);
-                    ctx.lineTo(1600,248);
-                    ctx.stroke();
-                }
+        this.buckets[xd/2-1][xd/2+1].children.push(this.buckets[xd/2-2][xd/2+1]);
         
-                //draw nodes and branches
-                for (let offset of offsets) {
-                    ctx.fillStyle = 'hsl(0,0%,25%)';
-                    ctx.font = "30px Arial";
-                    ctx.textAlign="left"; 
-                    ctx.fillText(offset[2],15+offset[0],40+offset[1]);
-                    for(let i = 0; i < graph.length; i++) {
-                        let node = graph[i]
-                        ctx.beginPath();
-                        ctx.arc(node[1]+offset[0], node[2]+offset[1], 3, 0, 2 * Math.PI, false);
-                        ctx.fillStyle = 'hsl(0,0%,25%)';
-                        ctx.fill();
-                        ctx.lineWidth = 1;
-                        ctx.strokeStyle = 'hsl(0,0%,25%)';
-                        ctx.stroke();
-            
-                        ctx.lineWidth = 2;
-                        for(let child of node[3]) {
-                            ctx.beginPath();
-                            ctx.moveTo(node[1]+offset[0],node[2]+offset[1]);
-                            ctx.lineTo(graph[child][1]+offset[0],graph[child][2]+offset[1]);
-                            ctx.stroke();
+        //add their branches
+        for(let i = 0; i < this.buckets.length; i++) {
+            for(let j = 0; j < this.buckets[i].length; j++) {
+                if (i == xd/2 && j == xd/2) {
+                    continue;
+                }
+                if (i > xd/2 && i < xd-1) {
+                    if (j > xd/2 && j < xd-1) { //bottom right
+                        if (i/j > 1) {
+                            this.buckets[i][j].add(this.buckets[i+1][j+1]);
+                            this.buckets[i][j].add(this.buckets[i+1][j]);
+                        } else {
+                            this.buckets[i][j].add(this.buckets[i][j+1]);
+                            this.buckets[i][j].add(this.buckets[i+1][j+1]);
+                        }
+                    } else if (j > 0) { //top right
+                        
+                        if ((i-xd/2)/(xd/2-j) > 1) {
+                            this.buckets[i][j].add(this.buckets[i+1][j]);
+                            this.buckets[i][j].add(this.buckets[i+1][j-1]);
+                        } else {
+                            this.buckets[i][j].add(this.buckets[i+1][j-1]);
+                            this.buckets[i][j].add(this.buckets[i][j-1]);
                         }
                     }
+                } else if (i > 0) {
+                    if (j > xd/2 && j < xd-1) { //bottom left
+                        
+                        if ((i-xd/2)/(xd/2-j) > 1) {
+                            this.buckets[i][j].add(this.buckets[i-1][j]);
+                            this.buckets[i][j].add(this.buckets[i-1][j+1]);
+                        } else {
+                            this.buckets[i][j].add(this.buckets[i-1][j+1]);
+                            this.buckets[i][j].add(this.buckets[i][j+1]);
+                        }
+                    } else if (j > 0) { // top left
+                        if (i/j < 1) {
+                            this.buckets[i][j].add(this.buckets[i-1][j-1]);
+                            this.buckets[i][j].add(this.buckets[i-1][j]);
+                        } else {
+                            this.buckets[i][j].add(this.buckets[i][j-1]);
+                            this.buckets[i][j].add(this.buckets[i-1][j-1]);
+                        }
+                        
+                    }
                 }
+                
+                
             }
-            draw_graph([[0,0, "Minimax"],[0,250, "Alpha-Beta R->L"],[800,0, "Alpha-Beta L->R"],[800,250, "Iterative Deepening"]]);
-            minimax(graph.length-1);
-            alphabetaO(graph.length-1, Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, false);
-            alphabetaO(graph.length-1, Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, true);
-            iterative();
+        }
+        this.buckets[xd/2+1][xd/2+1].children.push(this.buckets[xd/2+2][xd/2+1]);
+        
+        //compute heruristic
+        function heruristic(node) {
+            if (node.value != undefined) {
+                return node.value;
+            }
+            let sum = 0;
+            for(let i = 0; i < node.children.length; i++) {
+                sum += heruristic(node.children[i]);
+            }
+            node.heruristic = sum/node.children.length;
+            return node.heruristic;
         }
         
-        setup();
-    */
+        heruristic(this.start);
+    }
+    draw(ctx, x, y) {
+        ctx.fillStyle = 'hsl(60,5%,95%)';
+        let off = 5;
+        ctx.fillRect(x+off,y+off,500-off,500-off);
+        for(let i = 0; i < this.buckets.length; i++) {
+            for(let j = 0; j < this.buckets[i].length; j++) {
+                this.buckets[i][j].draw(ctx, x, y);
+            }
+        }
+    }
+}
+function* comp_minimax(node, ctx, x, y) {
+    if (node.minimax == true) {
+        return;
+    }
+    node.minimax = true;
+    node.mark(ctx, x, y);
+    yield;
+    for(let i = 0; i < node.children.length; i++) {
+        yield *comp_minimax(node.children[i], ctx, x, y);
+    }
+}
+function* comp_alphabeta(node, ctx, x, y, turn = true, alpha = Number.MIN_VALUE, beta = Number.MAX_VALUE) {
+     if (node.ab == true) {
+        return undefined;
+    }
+    node.ab = true;
+    node.mark(ctx, x, y);
+    yield;
+    if (node.value != undefined) {
+        return node.value;
+    }
+
+    let value = undefined;
+
+    for(let i = 0; i < node.children.length; i++) {
+        if (alpha >= beta) {
+            break;
+        }
+        
+        let result = yield *comp_alphabeta(node.children[i], ctx, x, y, !turn, alpha, beta);
+
+        if (result != undefined &&
+            (value == undefined ||
+            (turn == true ? result >= value : result <= value))) {
+            value = result;
+            if (turn == true) {
+                alpha = Math.max(value, alpha);
+            } else {
+                beta  = Math.min(value, beta);
+            }
+        }
+    }
+    return value; 
+}
+function* comp_alphabetar(node, ctx, x, y, turn = true, alpha = Number.MIN_VALUE, beta = Number.MAX_VALUE) {
+    if (node.abr == true) {
+        return undefined;
+    }
+    node.abr = true;
+    node.mark(ctx, x, y);
+    yield;
+    if (node.value != undefined) {
+        return node.value;
+    }
+
+    let value = undefined;
+
+    for(let i = node.children.length-1; i >= 0; i--) {
+        if (alpha >= beta) {
+            break;
+        }
+        
+        let result = yield *comp_alphabetar(node.children[i], ctx, x, y, !turn, alpha, beta);
+
+        if (result != undefined &&
+            (value == undefined ||
+            (turn == true ? result >= value : result <= value))) {
+            value = result;
+            if (turn == true) {
+                alpha = Math.max(value, alpha);
+            } else {
+                beta  = Math.min(value, beta);
+            }
+        }
+    }
+    return value;
+}
+function* comp_alphabetai(graph, ctx, x, y) {
+    function* helper(depth, node = graph.start, turn = true, alpha = Number.MIN_VALUE, beta = Number.MAX_VALUE) {
+        //don't allow loops
+        if (node.abi == true) {
+            //debugger;
+            return undefined;
+        }
+        node.abi = true;
+        //mark the node we've visited
+        node.mark(ctx, x, y);
+        yield;
+        //if the node is a leaf, we return the value
+        if (node.value != undefined) {
+            return node.value;
+        }
+        //we have reached the end, we give up
+        if (depth == 0) {
+            return node.heruristic;
+        }
+
+        let value = undefined;
+
+        //check if a best move has already been found
+		if (node.best != undefined) {
+            //debugger;
+            let result = yield *helper(depth-1, node.children[node.best], !turn, alpha, beta);
+            if (result != undefined) {
+                value = result;
+                if (turn == true) {
+                    alpha = Math.max(value, alpha);
+                } else {
+                    beta  = Math.min(value, beta);
+                }
+            }
+        }
+        
+        for(let i = 0; i < node.children.length; i++) {
+            if (alpha >= beta) {
+				break;
+			}
+			if (i == node.best) {
+				continue;
+            }
+            
+            let result = yield *helper(depth-1, node.children[i], !turn, alpha, beta);
+
+            if (result != undefined &&
+                (value == undefined ||
+                (turn == true ? result >= value : result <= value))) {
+                //debugger;
+                value = result;
+                node.best = i;
+                if (turn == true) {
+                    alpha = Math.max(value, alpha);
+                } else {
+                    beta  = Math.min(value, beta);
+                }
+            }
+        }
+		return value; 
+    }
+    function clearVisited(depth, node = graph.start) {
+        node.abi = false;
+        if (depth == 0) {
+            return;
+        }
+        for(let i = 0; i < node.children.length; i++) {
+            clearVisited(depth-1, node.children[i]);
+        }
+    }
+	for(let i = 1; i < graph.buckets.length/2+1; i++) {
+        graph.draw(ctx, x, y);
+        yield *helper(i);
+        clearVisited(i);
+    }
+    //yield *helper(graph.buckets.length/2+1);
+}
+function comparison() {
+    let canvas = document.getElementById("comparisonCanvas");
+    let canvasWidth = 1030;
+    let canvasHeight = 1030;
+    canvas.setAttribute("height", canvasHeight + "px");
+    canvas.setAttribute("width",  canvasWidth+"px");
+    canvas.setAttribute("style", "width: 80%; height: 45vw; margin: auto; display:block; cursor:pointer;");
+    let ctx = canvas.getContext("2d");
+
+    let int;
+    function setup() {
+        clearInterval(int);
+        
+        ctx.fillStyle = 'hsl(0,0%,35%)';
+        ctx.fillRect(0,0,1030,1030)
+        
+        let graph = new Graph(500, 800);
+        graph.draw(ctx, 9, 9);
+        graph.draw(ctx, 9, 517);
+        graph.draw(ctx, 517, 517);
+        graph.draw(ctx, 517, 9);
+        
+        let mini = comp_minimax(graph.start, ctx, 9, 9);
+        let ab   = comp_alphabeta(graph.start, ctx, 9, 517);
+        let abr  = comp_alphabetar(graph.start, ctx, 517, 517);
+        let abi  = comp_alphabetai(graph, ctx, 517, 9);
+
+        int = setInterval(()=>{
+            mini.next();
+            ab.next();
+            abr.next();
+            abi.next();
+            ctx.font = "3em Arial";
+            ctx.textAlign = "left";
+            ctx.fillStyle = "hsl(0,0%,90%)";
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 2;
+            ctx.fillText("Minimax", 20,500);
+            ctx.strokeText("Minimax", 20,500);
+            ctx.fillText("Iterative Deepening", 530,500);
+            ctx.strokeText("Iterative Deepening", 530,500);
+            ctx.fillText("Alpha-Beta", 20,1005);
+            ctx.strokeText("Alpha-Beta", 20,1005);
+            ctx.fillText("Alpha-Beta Reversed", 530,1005);
+            ctx.strokeText("Alpha-Beta Reversed", 530,1005);
+        }, 10);
+    }
+    canvas.onclick = setup;
+    let running = false;
+    function calc_pos() {
+        if ( running == false &&
+            window.scrollY > canvas.offsetTop - window.innerHeight &&
+            window.scrollY < canvas.offsetTop + canvas.clientHeight
+        ) {
+            running = true;
+            setup();
+        } else if (running == true &&
+            (window.scrollY < canvas.offsetTop - window.innerHeight ||
+            window.scrollY > canvas.offsetTop + canvas.clientHeight)) {
+            running = false;
+            clearInterval(int);
+        }
+
+    }
+    document.addEventListener('parallax1event',  calc_pos, false);
 }
